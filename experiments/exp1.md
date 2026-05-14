@@ -162,6 +162,8 @@ ddl_schema = re.sub(
 
 ---
 
+* Problem: The model populates the `manager_id` variable with missing values (nulls).
+
 ## Experiment 6
 
 **Model:** `gemini-2.0-flash`
@@ -191,4 +193,4 @@ Added a new Rule 7:
 
 ### **Conclusion**
 
-**In Experiment 5, despite the absence of errors, the model populates the `manager_id` variable with missing values (nulls). Even after adding explicit instructions in Experiment 6, the issue persists. Therefore, let's stick with the `3.1-pro-preview` model, where this problem does not occur.**
+**c. Even after adding explicit instructions in Experiment 6, the issue persists. Therefore, let's stick with the `3.1-pro-preview` model, where this problem does not occur.**

@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, text
 import pandas as pd
 from typing import Dict
-from src.core.load_env import load_env
+from src.core.utilts import load_env
 from src.core.utilts import create_logger
 import re
 

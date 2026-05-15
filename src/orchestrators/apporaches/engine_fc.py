@@ -1,13 +1,11 @@
 from google import genai
 from google.genai import types
 import pandas as pd
-from src.core.load_env import load_env
+from src.core.utilts import load_env
 from src.core.utilts import load_config, create_logger
 from typing import Dict
-from src.llm_tools.upload_data import upload_all_and_validate
-from src.core.state import get_collected_dataframes, reset_collected_dataframes
-from src.core.get_user_prompt import get_user_prompt
-
+from src.llm_tools.upload_data import upload_data_tool
+from src.database.database_handler import get_engine
 
 config = load_config()
 DB_CONFIG, GCP_CONFIG = load_env()
@@ -31,14 +29,13 @@ def fc_generator(system_instruction:str, user_prompt:str,temperature: float = 0.
 
     logger.info("Starting data generation process...")
 
-    reset_collected_dataframes()
 
     
     model_config = types.GenerateContentConfig(
         system_instruction=system_instruction,
         temperature=temperature,
         max_output_tokens=max_tokens,
-        tools=[upload_all_and_validate]
+        tools=[upload_data_tool]
         )
 
     try:
@@ -49,16 +46,32 @@ def fc_generator(system_instruction:str, user_prompt:str,temperature: float = 0.
             contents=[user_prompt],
             config=model_config
         )
+        
+        if response.text and "WARNING:" in response.text:
+            warning_msg = response.text.strip()
+            logger.warning(f"Model rejected the prompt: {warning_msg}")
+            return {}, warning_msg
 
-        collected = get_collected_dataframes()
+        logger.info("Model finished execution. Fetching fresh data from PostgreSQL...")
 
-        if collected:
-            logger.info(f"Data generation completed. Tables: {list(collected.keys())}")
+        collected_dataframes: Dict[str, pd.DataFrame] = {}
+
+        engine = get_engine()
+        
+        query = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';"
+        table_names = pd.read_sql(query, engine)['table_name'].tolist()
+        
+        for table in table_names:
+            collected_dataframes[table] = pd.read_sql_table(table, con=engine)
+
+        if collected_dataframes:
+            logger.info(f"Data generation completed.")
         else:
-            logger.error("No function calls found in model response.")
+            logger.error("Database is empty after generation. Model might have failed to use the tool.")
 
-        return collected
+        return collected_dataframes, None
+
 
     except Exception as e:
         logger.error(f"Error during data generation: {str(e)}")
-        return {}
+        return {}, f"WARNING: Internal error occurred: {str(e)}"

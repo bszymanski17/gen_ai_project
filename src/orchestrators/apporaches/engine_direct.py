@@ -52,20 +52,21 @@ def generating_data_loop(prompts:dict, system_instructions: str, starting_prompt
                 contents=[current_prompt],
                 config=config_llm
             )
+
             logger.info("Respone recived. Starting validation...")
             valid_data = DataResponse.model_validate_json(response.text)
             dataframes = {tab.table_name: pd.DataFrame(tab.table) for tab in valid_data.tables}
             upload_success, error_msg = upload_to_postgres(dataframes)
             if upload_success:
                 logger.info("Data generated successfully.")
-                return dataframes
+                return dataframes, None
             else:
                 raise RuntimeError(error_msg)
         except RuntimeError as r:
             logger.warning(f"Error on iter {iter+1} during uploading to PostgreSQL: {str(r)}")
             current_prompt += prompts['error_prompts']['runtime_error_prompt'].format(r=str(r))
         except ValidationError as v:
-            logger.warning(f"Validation error on iter {iter+1}. Feeding back to LLM...")
+            logger.warning(f"Validation error on iter {iter+1}: {str(v)}. Feeding back to LLM...")
             current_prompt += prompts['error_prompts']['validation_error_prompt'].format(v=str(v))
         except Exception as e:
             logger.error(f"Error druing data generation: {str(e)}")

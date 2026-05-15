@@ -1,30 +1,15 @@
-# aporach 1
-from src.orchestrators.direct.generator_direct import generate_data
-from src.orchestrators.direct.editor_direct import edit_data
-
-# aproach 2 (function calling)
-from src.orchestrators.function_calling.generator_fc import generate_data_fc
-from src.orchestrators.function_calling.editor_fc import edit_data_fc
-
-# aporach 3 (query database)
-from src.orchestrators.query.query_engine import query_engine, update_tables
-
-# config
+from src.orchestrators.edit_data import edit_data
+from src.orchestrators.generate_data import generate_data
 import streamlit as st
-from src.database.database_handler import init_tables, preprocess_ddl, get_engine
+from src.database.database_handler import init_tables, preprocess_ddl
 from src.core.utilts import create_logger
 import json
-from src.core.utilts import load_config
-import pandas as pd
+from src.core.utilts import load_config, get_cached
 
 st.set_page_config(page_title="Synthetic AI Data Gen", layout="wide")
 logger = create_logger("UI APP")
 
-@st.cache_data
-def get_cached_prompts():
-    return load_config("prompts/prompts.yaml")
-
-prompts = get_cached_prompts()
+prompts, config = get_cached()
 
 if "generated_data" not in st.session_state:
     st.session_state.generated_data = {} # dict table_name: table
@@ -59,9 +44,12 @@ with upper_section:
             
             if init_tables(ddl_schema):
                 with st.spinner("Generating data..."):
-                    generated_tables = generate_data(prompts=prompts, ddl_schema=ddl_schema, user_instructions=st.session_state.user_prompt,max_tokens=8000) # aporach 1
-                    # generated_tables = generate_data_fc(prompts=prompts, ddl_schema=ddl_schema, user_instructions=st.session_state.user_prompt) # aproach 2 (function calling)
-                    if generated_tables:
+                    generated_tables = None
+                    generated_tables, warning_msg = generate_data(prompts=prompts, ddl_schema=ddl_schema, user_instructions=st.session_state.user_prompt, approach=config['validation_approaches']['generating_approach'], temperature=0.7, max_tokens=65000)
+                    
+                    if warning_msg:
+                        st.warning(warning_msg)
+                    elif generated_tables:
                         st.session_state.generated_data = generated_tables
                         st.success("Data generated successfully!")
                     else:
@@ -102,16 +90,12 @@ with lower_section:
                     ddl_schema = uploaded_file.getvalue().decode('utf-8')
                     current_data_dict = {t_name: df.to_dict(orient='records') for t_name,df in st.session_state.generated_data.items()}
                     current_data_json = json.dumps(current_data_dict, default=str)
-                    # edited_tables = edit_data(current_data_json, prompts, ddl_schema, st.session_state.edit_prompt) # aporach 1
-                    # edited_tables = edit_data_fc(current_data_json, prompts, ddl_schema, st.session_state.edit_prompt) # aproach 2 with function calling
-                    
-                    
-                    # query aproach #
-                    response = query_engine(ddl_schema,system_instructions=prompts['system_prompts']['edit_query_main_promt'], user_instructions=st.session_state.edit_prompt) # aporach 3 with database queries
-                    edited_tables = update_tables(st.session_state.generated_data)                                                                                               # aporach 3 with database queries
-                    # end of query aporach #
+                    edited_tables = None
+                    edited_tables, warn_msg = edit_data(prompts=prompts, ddl_schema=ddl_schema, user_instructions=st.session_state.edit_prompt, approach=config['validation_approaches']['editing_approach'], data=current_data_json)
 
-                    if edited_tables:
+                    if warn_msg:
+                        st.warning(warn_msg)
+                    elif edited_tables:
                         st.session_state.generated_data = edited_tables
                         st.success("Data edited successfully.")
                         st.rerun()

@@ -1,2 +1,6 @@
 llm:
-  model: 'gemini-2.0-flash'
+  model: 'gemini-3.1-pro-preview'
+
+validation_approaches:
+  generating_approach: function_calling   # direct / function_calling
+  editing_approach: query    # direct / function_calling / query

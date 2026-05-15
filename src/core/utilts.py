@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from typing import Tuple, Dict
 from src.schemas.schemas import DatabaseConfig, GCPConfig
 from pydantic import ValidationError
-
+import streamlit as st
 
 def create_logger(name: str) -> logging.Logger:
     """
@@ -89,4 +89,8 @@ def load_env() -> Tuple[DatabaseConfig, GCPConfig]:
         raise RuntimeError("Error during loading enviroment variables.")
     
     return db_conf, gcp_conf
+
+@st.cache_data
+def get_cached():
+    return load_config("prompts/prompts.yaml"), load_config()
 

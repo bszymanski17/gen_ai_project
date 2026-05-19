@@ -127,7 +127,3 @@ DB_NAME=synthetic_bi_db
 2. **Populate Database:** Provide context-specific instructions, set your generation temperature, and click *Generate*.
 3. **Refine & Edit Data:** Use the "Edit instruction" field to modify, expand, or correct the generated synthetic datasets on the fly using natural language commands.
 4. **Analyze:** Switch to **Talk to your data**. Ask plain-text analytical questions (e.g., *"Show me the distribution of ratings as a bar chart"*). The frontend automatically displays clean charts, hides underlying relational code when visualizers trigger, and commits chat states to memory safely.
-
-```
-
-```

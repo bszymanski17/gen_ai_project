@@ -111,7 +111,7 @@ validation_approaches:
 
 ### Environment Secrets (`.env` Example)
 
-The application expects database credentials and GCP environment definitions to bind the Google GenAI Client correctly.
+The application expects database credentials, GCP environment and Langfuse configuration.
 
 ```env
 # Google Cloud Platform Setup

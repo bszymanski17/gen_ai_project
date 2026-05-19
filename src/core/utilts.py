@@ -92,5 +92,11 @@ def load_env() -> Tuple[DatabaseConfig, GCPConfig]:
 
 @st.cache_data
 def get_cached():
+    """
+    Loads and caches configuration files.
+
+    Returns:
+        tuple: (prompts_dict, main_config_dict)
+    """
     return load_config("prompts/prompts.yaml"), load_config()
 

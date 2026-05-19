@@ -1,1 +1,9 @@
+dotenv==0.9.9
 google-genai==1.75.0
+jsonschema==4.26.0
+numpy==2.4.4
+pandas==3.0.2
+plotly==6.7.0
+pydantic==2.13.4
+SQLAlchemy==2.0.49
+streamlit==1.57.0

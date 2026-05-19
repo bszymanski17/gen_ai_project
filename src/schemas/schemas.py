@@ -23,6 +23,9 @@ class DataResponse(BaseModel):
 
 
 class DatabaseConfig(BaseModel):
+    """
+    Configuration model for database connection .
+    """
     dbname: str
     user: str
     password: str
@@ -30,4 +33,8 @@ class DatabaseConfig(BaseModel):
     port: int
 
 class GCPConfig(BaseModel):
+    """
+    Configuration model for the Google Cloud Platform (GCP) environment.
+    """
     project_id: str
+

@@ -6,6 +6,7 @@ from src.llm_tools.query_database import query_database
 from src.database.database_handler import get_engine
 import pandas as pd
 import json
+from typing import Dict
 
 config = load_config()
 DB_config, GCP_config = load_env()
@@ -14,7 +15,7 @@ client = genai.Client(vertexai=True, project=GCP_config.project_id)
 logger = create_logger("Query database")
 
 
-def query_engine(ddl_schema: str, system_instructions: str, user_instructions:str, temperature: float=0.7, max_tokens=65000) -> bool:
+def query_engine(system_instructions: str, user_instructions:str, temperature: float=0.7, max_tokens=65000) -> bool:
     """
     Orchestrates the SQL query aporach to execute database operations based on user instructions.
 
@@ -57,7 +58,18 @@ def query_engine(ddl_schema: str, system_instructions: str, user_instructions:st
 
 
 
-def update_tables(generated_data):
+def update_tables(generated_data: str) -> Dict[str, pd.DataFrame]:
+    """
+    Fetches the updated state of specified database tables.
+
+    Args:
+        generated_data: A JSON-formatted string representing the current state 
+                        or schema, where keys are the table names to be fetched.
+
+    Returns:
+        dict: A dictionary mapping table names to pandas DataFrames containing 
+              the fresh data from the database.
+    """
     engine = get_engine()    
     generated_data = json.loads(generated_data)
 

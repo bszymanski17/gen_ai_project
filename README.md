@@ -13,7 +13,7 @@ The application operates through three core orchestrators, each designed for a s
    * Uses configurable LLM temperature and token boundaries to control data diversity and volume.
    * Validates and initializes database tables automatically before populating them.
    * Supports two distinct validation approaches:
-     **Direct**: Executes a robust retry cycle: `LLM call -> validation -> feedback loop` (if a validation error occurs, the error message is dynamically appended back into the prompt for the next loop iteration).
+   ** **Direct**: Executes a robust retry cycle: `LLM call -> validation -> feedback loop` (if a validation error occurs, the error message is dynamically appended back into the prompt for the next loop iteration).
      **function_calling**
 
 2. **Data Editing**

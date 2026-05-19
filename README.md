@@ -34,28 +34,33 @@ The application operates through three core orchestrators, each designed for a s
 ## 📂 Project Structure
 
 ```text
-├── .venv/                  # Python virtual environment
 ├── config/
-│   └── config.yaml         # Global application and LLM configuration
+│   └── config.yaml          # Global application and LLM configuration
 ├── experiments/
-│   └── llm_experiments_log.md             # Prompt engineering and research logs
+│   └── llm_experiments_log.md  # Prompt engineering and research logs
 ├── prompts/
-│   └── prompts.yaml        # System and User prompt templates 
+│   └── prompts.yaml         # System and User prompt templates 
 └── src/
     ├── core/
-    │   └── utilts.py       # Core utilities (environment and config loaders, logger)
-    ├── database/           # Connection pooling and database initialization handlers
-    ├── llm_tools/          # Atomic tools mapped to Google GenAI Function Calling
+    │   └── utilts.py        # Core utilities (environment and config loaders, logger)
+    ├── database/            # Connection pooling and database initialization handlers
+    │   └── database_handler.py
+    ├── llm_tools/           # Atomic tools mapped to Google GenAI Function Calling
     │   ├── query_database.py
-    │   ├── talk_to_data_tools.py  # Tools for query execution and plot structure definition
+    │   ├── talk_to_data_tools.py # Tools for query execution and plot structure definition
     │   └── upload_data.py
-    └── orchestrators/      # Higher-level managers routing LLM responses to local processes
-        ├── apporaches/     # Internal logic structures for validation pipelines
+    └── orchestrators/       # Higher-level managers routing LLM responses to local processes
+        ├── approaches/      # Internal logic structures for validation pipelines
+        │   ├── engine_direct.py
+        │   ├── engine_fc.py
+        │   └── engine_query.py
         ├── edit_data.py
         ├── generate_data.py
         └── talk_to_data.py
 ├── app.py                  # Main Streamlit user interface and session state manager
 ├── .env                    # Local environment secrets (Git ignored)
+├── .gitignore              # Specifies intentionally untracked files to ignore from Git version control
+├── README.md               # Project documentation and setup guide
 └── requirements.txt        # Project dependencies
 
 ```

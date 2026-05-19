@@ -124,6 +124,11 @@ DB_HOST=localhost
 DB_PORT="5432"
 DB_NAME=synthetic_bi_db
 
+# Langfuse configuration 
+LANGFUSE_SECRET_KEY=your_langfuse_secret_key
+LANGFUSE_PUBLIC_KEY=your_langfuse_public_key
+LANGFUSE_BASE_URL=your_langfuse_base_url
+
 ```
 
 ---

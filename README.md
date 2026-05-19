@@ -16,14 +16,14 @@ The application operates through three core orchestrators, each designed for a s
    
        * **Direct**: Executes a robust retry cycle: `LLM call -> validation -> feedback loop` (if a validation error occurs, the error message is dynamically appended back into the prompt for the next loop iteration).
 
-       * **function_calling**
+       * **Function calling**
 
 3. **Data Editing**
    * Allows quick, natural language instructions to modify, correct, or expand existing synthetic data.
    *  * Supports three distinct validation approaches:
-       **Direct**: Executes a robust retry cycle: `LLM call -> validation -> feedback loop` (if a validation error occurs, the error message is dynamically appended back into the prompt for the next loop iteration).
-       **function_calling**
-       **Query**: Generates precise SQL modification statements (e.g., `UPDATE`, `INSERT`, `DELETE`) to execute the requested data edits directly within the database.
+          * **Direct**: Executes a robust retry cycle: `LLM call -> validation -> feedback loop` (if a validation error occurs, the error message is dynamically appended back into the prompt for the next loop iteration).
+          * **Function Calling**
+          * **Query**: Generates precise SQL modification statements (e.g., `UPDATE`, `INSERT`, `DELETE`) to execute the requested data edits directly within the database.
 
 4. **Talk to Your Data (`talk_to_data.py`)**
    * Analytical interface that strictly translates user queries into database operations or create data visualizations.

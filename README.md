@@ -57,6 +57,8 @@ The application operates through three core orchestrators, each designed for a s
         ├── edit_data.py
         ├── generate_data.py
         └── talk_to_data.py
+├── tests/                  # Application testing and validation suite
+│   └── edit_mode_tests.md  # Test cases for the data editing
 ├── app.py                  # Main Streamlit user interface and session state manager
 ├── .env                    # Local environment secrets (Git ignored)
 ├── .gitignore              # Specifies intentionally untracked files to ignore from Git version control

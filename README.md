@@ -14,9 +14,9 @@ The application operates through three core orchestrators, each designed for a s
    * Validates and initializes database tables automatically before populating them.
    * Supports two distinct validation approaches:
    
-   **Direct**: Executes a robust retry cycle: `LLM call -> validation -> feedback loop` (if a validation error occurs, the error message is dynamically appended back into the prompt for the next loop iteration).
+   * **Direct**: Executes a robust retry cycle: `LLM call -> validation -> feedback loop` (if a validation error occurs, the error message is dynamically appended back into the prompt for the next loop iteration).
 
-   **function_calling**
+   * **function_calling**
 
 3. **Data Editing**
    * Allows quick, natural language instructions to modify, correct, or expand existing synthetic data.

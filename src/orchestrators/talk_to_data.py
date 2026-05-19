@@ -1,19 +1,51 @@
 from google import genai
 from google.genai import types
 from src.core.utilts import load_env
-from src.core.utilts import create_logger, load_config
+from src.core.utilts import create_logger, get_cached
 from src.llm_tools.talk_to_data_tools import execute_query, create_plot
 import plotly.express as px
 
 
-config = load_config()
+prompts, config = get_cached()
 DB_config, GCP_config = load_env()
 client = genai.Client(vertexai=True, project=GCP_config.project_id)
 
 logger = create_logger("Talk to your data")
 
+def init_data_chat(temperature: float = 0.7, max_tokens: int = 65000):
+    """
+    Initializes a persistent Gemini chat session.
 
-def talk_to_data(system_instructions: str, user_instructions:str, temperature: float=0.7, max_tokens=65000)->dict:
+    Args:
+        prompts: A dictionary containing prompt templates, specifically for formatting error messages.
+        config: config.yaml file
+        project_id: project_id from .env
+        temperature: Controls the randomness of the LLM output.
+        max_tokens: Maximum number of tokens the LLM is allowed to generate.
+
+    Returns:
+        Any: A persistent Gemini chat session instance used to maintain conversation history.
+    """
+    
+    from src.llm_tools.talk_to_data_tools import execute_query, create_plot
+
+    llm_config = types.GenerateContentConfig(
+        system_instruction=prompts['system_prompts']['talk_to_data_main_promot'],
+        temperature=temperature,  
+        max_output_tokens=max_tokens,
+        tools=[execute_query, create_plot],
+        automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True)
+    )
+    
+    logger.info("Creating a new chat session.")
+    return client.chats.create(
+        model=config['llm']['model'],
+        config=llm_config
+    )
+
+
+
+def talk_to_data(chat, user_instructions:str)->dict:
     """
     Orchestrates the SQL query aporach to execute database operations based on user instructions.
 
@@ -27,14 +59,6 @@ def talk_to_data(system_instructions: str, user_instructions:str, temperature: f
     Returns:
         
     """
-
-    llm_config = types.GenerateContentConfig(
-        system_instruction=system_instructions,
-        temperature=temperature,
-        max_output_tokens=max_tokens,
-        tools=[execute_query, create_plot],
-        automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True)
-                )
     
     artifacts = {
         "sql_query": None,
@@ -45,13 +69,10 @@ def talk_to_data(system_instructions: str, user_instructions:str, temperature: f
 
     try:
         logger.info("Invoking model...")
-        response = client.models.generate_content(
-            model=config['llm']['model'],
-            config=llm_config,
-            contents=[user_instructions]
-        )
+        response = chat.send_message(user_instructions)
 
         plot_code_str = None
+        tool_responses = []
 
         if response.function_calls:
             for tool_call in response.function_calls:
@@ -61,9 +82,14 @@ def talk_to_data(system_instructions: str, user_instructions:str, temperature: f
                 if tool_name == "execute_query":
                     query = tool_args.get("query", "")
                     artifacts['sql_query'] = query
-                    _, artifacts['df'] = execute_query(query)
+                    status_str, artifacts['df'] = execute_query(query)
+                    tool_responses.append(types.Part.from_function_response(name=tool_name,response={"result": status_str}))
                 elif tool_name == "create_plot":
                     plot_code_str = tool_args.get("python_code", "")
+                    tool_responses.append(
+                        types.Part.from_function_response(name=tool_name, response={"result": "SUCCESS: Plot code received."}))
+                    
+            final_turn = chat.send_message(tool_responses)
 
         elif response.text:
             if "WARNING:" in response.text:

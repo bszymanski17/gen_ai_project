@@ -3,7 +3,6 @@ import pandas as pd
 from sqlalchemy import text
 from src.core.utilts import create_logger
 from typing import Optional, Tuple
-import plotly.express as px
 
 logger = create_logger("Execute query")
 

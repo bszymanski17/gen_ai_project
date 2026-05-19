@@ -1,14 +1,15 @@
 from google import genai
 from google.genai import types
 from src.core.utilts import load_env
-from src.core.utilts import create_logger, load_config
+from src.core.utilts import create_logger, get_cached
 from src.llm_tools.query_database import query_database
 from src.database.database_handler import get_engine
 import pandas as pd
 import json
 from typing import Dict
 
-config = load_config()
+prompts, config = get_cached()
+
 DB_config, GCP_config = load_env()
 client = genai.Client(vertexai=True, project=GCP_config.project_id)
 

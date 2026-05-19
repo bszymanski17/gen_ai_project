@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 class TableData(BaseModel):
     """
@@ -20,6 +20,7 @@ class DataResponse(BaseModel):
         tables: A collection of TableData objects representing all generated tables.
     """
     tables: List[TableData] = Field(description="List of tables containing the generated synthetic rows.")
+    warning: Optional[str] = None
 
 
 class DatabaseConfig(BaseModel):

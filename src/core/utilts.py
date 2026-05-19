@@ -7,8 +7,10 @@ from typing import Tuple, Dict
 from src.schemas.schemas import DatabaseConfig, GCPConfig
 from pydantic import ValidationError
 import streamlit as st
+from google import genai
+from google.genai import types
 
-def create_logger(name: str) -> logging.Logger:
+def create_logger(name: str)  -> logging.Logger:
     """
     Initializes a standarized logger.
     
@@ -89,6 +91,7 @@ def load_env() -> Tuple[DatabaseConfig, GCPConfig]:
         raise RuntimeError("Error during loading enviroment variables.")
     
     return db_conf, gcp_conf
+
 
 @st.cache_data
 def get_cached():

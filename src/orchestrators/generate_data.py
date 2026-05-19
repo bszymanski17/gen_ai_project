@@ -20,13 +20,13 @@ def generate_data(prompts: dict, ddl_schema: str, user_instructions: str, approa
     """
     
     if approach == "direct": 
-        system_prompt = prompts['system_prompts']['main_prompt']
-        starting_prompt = prompts['user_prompts']['main_prompt'].format(ddl_schema=ddl_schema,user_instructions=user_instructions)
+        system_prompt = prompts['system_prompts']['generate_main_prompt_direct']
+        starting_prompt = prompts['user_prompts']['generate_main_prompt_fc_direct'].format(ddl_schema=ddl_schema,user_instructions=user_instructions)
         return generating_data_loop(prompts, system_prompt, starting_prompt, temperature, max_tokens, max_retries)
     
     elif approach == "function_calling":
-        system_prompt = prompts['system_prompts']['main_prompt']
-        user_prompt = prompts['user_prompts']['main_prompt'].format(ddl_schema=ddl_schema, user_instructions=user_instructions)
+        system_prompt = prompts['system_prompts']['generate_main_prompt_fc']
+        user_prompt = prompts['user_prompts']['generate_main_prompt_fc_direct'].format(ddl_schema=ddl_schema, user_instructions=user_instructions)
         return fc_generator(system_instruction=system_prompt, user_prompt=user_prompt,temperature=temperature, max_tokens=max_tokens)
     
     return None, "WARNING: Unknown approach type."

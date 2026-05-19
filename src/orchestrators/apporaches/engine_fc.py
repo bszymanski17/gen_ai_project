@@ -1,13 +1,13 @@
 from google import genai
 from google.genai import types
 import pandas as pd
-from src.core.utilts import load_env
-from src.core.utilts import load_config, create_logger
+from src.core.utilts import load_config, create_logger, load_env, get_cached
 from typing import Dict
 from src.llm_tools.upload_data import upload_data_tool
 from src.database.database_handler import get_engine
 
-config = load_config()
+prompts, config = get_cached()
+
 DB_CONFIG, GCP_CONFIG = load_env()
 
 logger = create_logger("Generating data")

@@ -1,4 +1,4 @@
-from src.core.utilts import load_env, load_config, create_logger
+from src.core.utilts import load_env, create_logger, get_cached
 from google import genai
 from google.genai import types
 from src.schemas.schemas import DataResponse
@@ -7,7 +7,7 @@ from src.database.database_handler import upload_to_postgres
 from pydantic import ValidationError
 from typing import Dict
 
-config = load_config()
+prompts, config = get_cached()
 DB_CONF, GCP_CONF = load_env()
 
 logger = create_logger("Data generator")
@@ -55,6 +55,11 @@ def generating_data_loop(prompts:dict, system_instructions: str, starting_prompt
 
             logger.info("Respone recived. Starting validation...")
             valid_data = DataResponse.model_validate_json(response.text)
+
+            if valid_data.warning:
+                logger.warning(f"Guardrail triggered by model: {valid_data.warning}")
+                return {}, valid_data.warning
+
             dataframes = {tab.table_name: pd.DataFrame(tab.table) for tab in valid_data.tables}
             upload_success, error_msg = upload_to_postgres(dataframes)
             if upload_success:

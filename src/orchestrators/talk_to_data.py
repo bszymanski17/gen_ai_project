@@ -7,7 +7,7 @@ import plotly.express as px
 
 
 prompts, config = get_cached()
-DB_config, GCP_config = load_env()
+DB_config, GCP_config, _ = load_env()
 client = genai.Client(vertexai=True, project=GCP_config.project_id)
 
 logger = create_logger("Talk to your data")
@@ -42,7 +42,6 @@ def init_data_chat(temperature: float = 0.7, max_tokens: int = 65000):
         model=config['llm']['model'],
         config=llm_config
     )
-
 
 
 def talk_to_data(chat, user_instructions:str)->dict:

@@ -7,15 +7,16 @@ from src.database.database_handler import get_engine
 import pandas as pd
 import json
 from typing import Dict
+from langfuse import observe
 
 prompts, config = get_cached()
 
-DB_config, GCP_config = load_env()
+DB_config, GCP_config, _ = load_env()
 client = genai.Client(vertexai=True, project=GCP_config.project_id)
 
 logger = create_logger("Query database")
 
-
+@observe()
 def query_engine(system_instructions: str, user_instructions:str, temperature: float=0.7, max_tokens=65000) -> bool:
     """
     Orchestrates the SQL query aporach to execute database operations based on user instructions.

@@ -6,7 +6,7 @@ from src.core.utilts import create_logger
 import re
 
 logger = create_logger("Database handler")
-DB_CONFIG, GCP_CONFIG = load_env()
+DB_CONFIG, GCP_CONFIG, _ = load_env()
 
 def preprocess_ddl(ddl_schema: str) -> str:
     return re.sub(r'(?i)(REFERENCES\s+\w+\s*\([^)]+\))(?!\s+DEFERRABLE)', r'\1 DEFERRABLE INITIALLY IMMEDIATE', ddl_schema)

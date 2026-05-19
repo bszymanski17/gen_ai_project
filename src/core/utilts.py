@@ -4,7 +4,7 @@ from typing import Dict, Any
 import os
 from dotenv import load_dotenv
 from typing import Tuple, Dict
-from src.schemas.schemas import DatabaseConfig, GCPConfig
+from src.schemas.schemas import DatabaseConfig, GCPConfig, LFConfig
 from pydantic import ValidationError
 import streamlit as st
 from google import genai
@@ -57,14 +57,15 @@ def load_config(config_path: str = "config/config.yaml") -> Dict[str, Any]:
         logger.error(f"Error during YAML confih loading: {str(e)}")
 
 
-def load_env() -> Tuple[DatabaseConfig, GCPConfig]:
+def load_env() -> Tuple[DatabaseConfig, GCPConfig, LFConfig]:
     """
     Loads and validates environment variables for DB and GCP.
 
     Returns:
-        Tuple[Dict[str, str], Dict[str, str]]: A tuple containing two dictionaries:
+        Tuple[Dict[str, str], Dict[str, str], Dict[str, str]]: A tuple containing tthree dictionaries:
             - DB_CONFIG: Database connection settings (dbname, user, password, host, port).
             - GCP_CONFIG: Google Cloud settings (project_id).
+            - LANGFUSE_CONFIG: Lanfuse settings.
     """
 
     logger.info("Loading environment variables...")
@@ -82,6 +83,12 @@ def load_env() -> Tuple[DatabaseConfig, GCPConfig]:
         gcp_conf = GCPConfig(
             project_id= os.getenv("GCP_PROJECT_ID")
         )
+
+        langfuse_conf = LFConfig(
+            langfuse_secret_key= os.getenv("LANGFUSE_SECRET_KEY"),
+            langfuse_public_key= os.getenv("LANGFUSE_PUBLIC_KEY"),
+            langfuse_base_url =os.getenv("LANGFUSE_BASE_URL")
+        )
  
     except ValidationError as v:
         logger.error(f"Error during validation enviroment variables: {str(v)}")
@@ -90,7 +97,7 @@ def load_env() -> Tuple[DatabaseConfig, GCPConfig]:
         logger.error(f"Error during loading enviroment variables: {str(e)}")
         raise RuntimeError("Error during loading enviroment variables.")
     
-    return db_conf, gcp_conf
+    return db_conf, gcp_conf, langfuse_conf
 
 
 @st.cache_data
@@ -102,4 +109,14 @@ def get_cached():
         tuple: (prompts_dict, main_config_dict)
     """
     return load_config("prompts/prompts.yaml"), load_config()
+
+@st.cache_resource
+def init_instrumentation():
+    from langfuse import get_client
+    from openinference.instrumentation.google_genai import GoogleGenAIInstrumentor
+    
+    # Inicjalizacja klienta i włączenie śledzenia (wykona się TYLKO RAZ)
+    get_client()
+    GoogleGenAIInstrumentor().instrument()
+    return True
 

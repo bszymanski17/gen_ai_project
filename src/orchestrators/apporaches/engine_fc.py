@@ -5,14 +5,16 @@ from src.core.utilts import load_config, create_logger, load_env, get_cached
 from typing import Dict
 from src.llm_tools.upload_data import upload_data_tool
 from src.database.database_handler import get_engine
+from langfuse import observe
 
 prompts, config = get_cached()
 
-DB_CONFIG, GCP_CONFIG = load_env()
+DB_CONFIG, GCP_CONFIG, _ = load_env()
 
 logger = create_logger("Generating data")
 client = genai.Client(vertexai=True, project=GCP_CONFIG.project_id)
 
+@observe()
 def fc_generator(system_instruction:str, user_prompt:str,temperature: float = 0.7,max_tokens: int = 65000,) -> Dict[str, pd.DataFrame]:
     """
     Generates synthetic data using Gemini automatic function calling.

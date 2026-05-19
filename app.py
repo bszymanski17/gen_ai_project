@@ -4,13 +4,16 @@ import streamlit as st
 from src.database.database_handler import init_tables, preprocess_ddl
 from src.core.utilts import create_logger
 import json
-from src.core.utilts import get_cached
+from src.core.utilts import get_cached, init_instrumentation
 from src.orchestrators.talk_to_data import talk_to_data, init_data_chat
 
 st.set_page_config(page_title="Synthetic AI Data Gen", layout="wide")
 logger = create_logger("UI APP")
 
+init_instrumentation()
+
 prompts, config = get_cached()
+
 
 if "generated_data" not in st.session_state:
     st.session_state.generated_data = {} # dict table_name: table

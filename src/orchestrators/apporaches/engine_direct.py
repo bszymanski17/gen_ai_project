@@ -6,14 +6,16 @@ import pandas as pd
 from src.database.database_handler import upload_to_postgres
 from pydantic import ValidationError
 from typing import Dict
+from langfuse import observe
 
 prompts, config = get_cached()
-DB_CONF, GCP_CONF = load_env()
+DB_CONF, GCP_CONF, _ = load_env()
 
 logger = create_logger("Data generator")
 
 client = genai.Client(vertexai=True, project=GCP_CONF.project_id)
 
+@observe()
 def generating_data_loop(prompts:dict, system_instructions: str, starting_prompt: str, temperature: float, max_tokens: int, max_retries: int = 3) -> Dict[str, pd.DataFrame]:
     """
     Data generation process with an integrated error-correction retry loop.

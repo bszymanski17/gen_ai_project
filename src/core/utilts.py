@@ -115,7 +115,6 @@ def init_instrumentation():
     from langfuse import get_client
     from openinference.instrumentation.google_genai import GoogleGenAIInstrumentor
     
-    # Inicjalizacja klienta i włączenie śledzenia (wykona się TYLKO RAZ)
     get_client()
     GoogleGenAIInstrumentor().instrument()
     return True

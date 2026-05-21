@@ -2,14 +2,16 @@ from src.orchestrators.edit_data import edit_data
 from src.orchestrators.generate_data import generate_data
 import streamlit as st
 from src.database.database_handler import init_tables, preprocess_ddl
-from src.core.utilts import create_logger
+from src.core.utilts import create_logger, load_config
 import json
 from src.core.utilts import get_cached, init_instrumentation
 from src.orchestrators.talk_to_data import talk_to_data, init_data_chat
+from src.core.jailbreak_detection import security_check
 
 st.set_page_config(page_title="Synthetic AI Data Gen", layout="wide")
 logger = create_logger("UI APP")
 
+#langfuse
 init_instrumentation()
 
 prompts, config = get_cached()
@@ -60,6 +62,7 @@ if st.session_state.current_page == "data_generation":
         
         if st.button(label="Generate"):
             if "ddl_schema" in st.session_state and st.session_state.ddl_schema is not None:
+                security_check(st.session_state.user_prompt, "generation")
                 
                 if init_tables(st.session_state.ddl_schema):
                     with st.spinner("Generating data..."):
@@ -107,6 +110,7 @@ if st.session_state.current_page == "data_generation":
         with col_submit:
             if st.button(label="Submit"):
                 if st.session_state.edit_prompt and st.session_state.generated_data and st.session_state.ddl_schema:
+                    security_check(st.session_state.edit_prompt, "generation")
                     with st.spinner("Editing data..."):
                         ddl_schema = st.session_state.ddl_schema
                         current_data_dict = {t_name: df.to_dict(orient='records') for t_name,df in st.session_state.generated_data.items()}
@@ -161,6 +165,7 @@ elif st.session_state.current_page == "talk_to_data":
 
     if user_ask_prompt:
         if st.session_state.generated_data != {}:
+            security_check(user_ask_prompt, "chat")
             st.session_state.chat_messages.append({'role': 'user', 'text': user_ask_prompt})
             with st.chat_message("user"):
                 st.write(user_ask_prompt)

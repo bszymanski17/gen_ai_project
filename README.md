@@ -53,6 +53,8 @@ The application operates through three core orchestrators, each designed for a s
     │   ├── query_database.py      # Tool for executing SQL queries on the target database
     │   ├── talk_to_data_tools.py  # Tools for query execution and plot structure definition
     │   └── upload_data.py         # Tool for upload data to PostgreSQL,
+    ├── schemas/                   # Pydantic models for structured LLM responses
+    │   └── schemas.py          
     └── orchestrators/             # Higher-level managers routing LLM responses to local processes
         ├── approaches/            # Internal logic structures for validation pipelines
         │   ├── engine_direct.py

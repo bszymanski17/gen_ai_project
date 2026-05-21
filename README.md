@@ -36,32 +36,34 @@ The application operates through three core orchestrators, each designed for a s
 ```text
 ├── config/
 │   └── config.yaml          # Global application and LLM configuration
-├── experiments/
-│   └── llm_experiments_log.md  # Prompt engineering and research logs
+├── docs/
+│   ├── experiments/
+│   │   └── experiments_for_generation_part.md    # Prompt engineering and research logs
+│   └── tests/
+│       └── edit_mode_tests.md                    # Test cases for the data editing mode
 ├── prompts/
 │   └── prompts.yaml         # System and User prompt templates 
 └── src/
     ├── core/
-    │   └── utilts.py        # Core utilities (environment and config loaders, logger)
+    │   ├── jailbreak_detection.py # LLM-as-a-judge security & guardrail tracking
+    │   └── utilts.py        # Core utilities (env/config loaders, logger) NOTE: Typo in filename is structural
     ├── database/            # Connection pooling and database initialization handlers
     │   └── database_handler.py
-    ├── llm_tools/           # Atomic tools mapped to Google GenAI Function Calling
-    │   ├── query_database.py
-    │   ├── talk_to_data_tools.py # Tools for query execution and plot structure definition
-    │   └── upload_data.py
-    └── orchestrators/       # Higher-level managers routing LLM responses to local processes
-        ├── approaches/      # Internal logic structures for validation pipelines
+    ├── llm_tools/           # Atomic tools mapped to Function Calling
+    │   ├── query_database.py      # Tool for executing SQL queries on the target database
+    │   ├── talk_to_data_tools.py  # Tools for query execution and plot structure definition
+    │   └── upload_data.py         # Tool for upload data to PostgreSQL,
+    └── orchestrators/             # Higher-level managers routing LLM responses to local processes
+        ├── approaches/            # Internal logic structures for validation pipelines
         │   ├── engine_direct.py
         │   ├── engine_fc.py
         │   └── engine_query.py
         ├── edit_data.py
         ├── generate_data.py
         └── talk_to_data.py
-├── tests/                  # Application testing and validation suite
-│   └── edit_mode_tests.md  # Test cases for the data editing
-├── app.py                  # Main Streamlit user interface and session state manager
+├── app.py                  # Main Streamlit UI, router, and session state manager
 ├── .env                    # Local environment secrets (Git ignored)
-├── .gitignore              # Specifies intentionally untracked files to ignore from Git version control
+├── .gitignore              # Specifies intentionally untracked files to ignore from Git
 ├── README.md               # Project documentation and setup guide
 └── requirements.txt        # Project dependencies
 

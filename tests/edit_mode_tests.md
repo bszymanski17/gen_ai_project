@@ -6,3 +6,7 @@
 | Increase restaurant_id by 1 in the restaurants table | 1 | **MOD-PK:** Modifying a Primary Key (PK) in a parent table (requires updating associated FKs). |
 | For order_id = 3 replace the restaurant_id  with 300 | 1 | **MOD-FK:** Targeted Foreign Key update (assigning a new reference) for a specific order. |
 | Change the author ID to 7 for the book with ID 4. | 1 | **MOD-FK:** Updating a relationship link between entities (Book → Author). |
+
+
+
+In conclusion, these tests prove that the application can successfully understand natural language prompts to generate and edit structured data. The app accurately handles complex relational logic, like updating primary and foreign keys, without breaking the data structure. 
